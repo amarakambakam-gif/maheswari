@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BakeEase - Home Bakery Order Management</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#fff8f3;color:#3d2b24}
+header{background:#6b3f2a;color:white;padding:16px 6%;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.logo{font-size:25px;font-weight:bold}.logo span{color:#ffd9b8}
+nav button{background:none;border:0;color:white;margin:0 5px;font-size:15px;cursor:pointer;padding:9px 11px;border-radius:8px}
+nav button:hover{background:#85533b}
+.page{display:none}.page.active{display:block}
+.hero{padding:70px 7%;display:flex;gap:35px;align-items:center;justify-content:space-between;background:linear-gradient(120deg,#ffe8d5,#fff8f3)}
+.hero-text{max-width:600px}.hero h1{font-size:45px;margin-bottom:15px;color:#5a3425}
+.hero p{font-size:18px;line-height:1.6;margin-bottom:22px}
+.btn{border:0;background:#c76b3d;color:#fff;padding:12px 18px;border-radius:9px;cursor:pointer;font-weight:bold}
+.btn:hover{background:#a9552f}
+.hero-card{font-size:100px;background:white;padding:35px;border-radius:25px;box-shadow:0 10px 30px #0001}
+.section{padding:35px 7%}.section h2{text-align:center;margin-bottom:22px;font-size:30px}
+.search{display:flex;gap:10px;max-width:700px;margin:0 auto 25px}
+.search input{flex:1;padding:12px;border:1px solid #ddd;border-radius:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.card{background:white;border-radius:14px;padding:18px;box-shadow:0 5px 18px #00000012}
+.product-img{height:150px;border-radius:12px;background:#fff0e5;display:flex;align-items:center;justify-content:center;font-size:70px;margin-bottom:14px}
+.card h3{margin-bottom:7px}.price{font-weight:bold;color:#b4542f;margin:8px 0 13px}
+.card .btn{width:100%}
+.badge{display:inline-block;background:#ffe0cc;color:#8a462d;padding:5px 9px;border-radius:20px;font-size:12px}
+.cart-box,.form-box,.admin-box{background:white;padding:22px;border-radius:14px;box-shadow:0 5px 18px #00000012;max-width:850px;margin:auto}
+.cart-item{display:flex;justify-content:space-between;gap:15px;padding:13px 0;border-bottom:1px solid #eee}
+.qty button{border:1px solid #ccc;background:white;border-radius:5px;padding:3px 8px;cursor:pointer}
+.total{font-size:20px;font-weight:bold;text-align:right;margin:20px 0}
+input,select,textarea{width:100%;padding:11px;margin:7px 0 14px;border:1px solid #d8d0cb;border-radius:8px}
+label{font-weight:bold;font-size:14px}
+.order{border-left:5px solid #c76b3d;padding:15px;margin:12px 0;background:#fff8f3;border-radius:8px}
+.status{color:#a54f2d;font-weight:bold}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin-bottom:20px}
+.stat{background:#fff0e5;padding:20px;border-radius:12px;text-align:center}.stat b{display:block;font-size:28px}
+footer{text-align:center;background:#3d2b24;color:white;padding:22px;margin-top:30px}
+@media(max-width:700px){.hero{flex-direction:column;text-align:center}.hero h1{font-size:34px}header{flex-direction:column;gap:10px}nav{display:flex;flex-wrap:wrap;justify-content:center}.hero-card{font-size:70px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🧁 Bake<span>Ease</span></div>
+  <nav>
+    <button onclick="showPage('home')">Home</button>
+    <button onclick="showPage('products')">Products</button>
+    <button onclick="showPage('cart')">Cart 🛒 (<span id="cartCount">0</span>)</button>
+    <button onclick="showPage('orders')">My Orders</button>
+    <button onclick="showPage('admin')">Admin</button>
+  </nav>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <div class="hero-text">
+      <span class="badge">Fresh • Homemade • Made to Order</span>
+      <h1>Delicious Bakes, Made With Love.</h1>
+      <p>Order homemade cakes, brownies, cookies and breads from your local home bakery. Manage your complete order from one simple application.</p>
+      <button class="btn" onclick="showPage('products')">Explore Bakes 🍰</button>
+    </div>
+    <div class="hero-card">🎂🍪🧁</div>
+  </div>
+  <div class="section">
+    <h2>What This Application Does</h2>
+    <div class="grid">
+      <div class="card"><h3>🛍️ Easy Ordering</h3><p>Browse products, add them to cart and place an order.</p></div>
+      <div class="card"><h3>📦 Order Tracking</h3><p>Track your order from confirmation to delivery.</p></div>
+      <div class="card"><h3>👩‍🍳 Baker Dashboard</h3><p>Manage products and update customer order status.</p></div>
+      <div class="card"><h3>🎂 Custom Orders</h3><p>Request a customized cake with your preferred details.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="products" class="page">
+  <div class="section">
+    <h2>Our Homemade Bakes</h2>
+    <div class="search"><input id="search" placeholder="Search cakes, brownies, cookies..." oninput="renderProducts()"></div>
+    <div id="productGrid" class="grid"></div>
+  </div>
+</section>
+
+<section id="cart" class="page">
+  <div class="section">
+    <h2>Your Cart</h2>
+    <div id="cartBox" class="cart-box"></div>
+  </div>
+</section>
+
+<section id="checkout" class="page">
+  <div class="section">
+    <h2>Checkout</h2>
+    <div class="form-box">
+      <form onsubmit="placeOrder(event)">
+        <label>Customer Name</label><input id="customerName" required>
+        <label>Phone Number</label><input id="phone" type="tel" required>
+        <label>Delivery Address</label><textarea id="address" required></textarea>
+        <label>Delivery Date</label><input id="deliveryDate" type="date" required>
+        <label>Payment Method</label>
+        <select id="payment"><option>Cash on Delivery</option><option>UPI (Demo)</option><option>Card (Demo)</option></select>
+        <button class="btn" type="submit">Place Order</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="orders" class="page">
+  <div class="section">
+    <h2>My Orders</h2>
+    <div id="ordersBox" class="cart-box"></div>
+  </div>
+</section>
+
+<section id="admin" class="page">
+  <div class="section">
+    <h2>Baker / Admin Dashboard</h2>
+    <div class="stats">
+      <div class="stat">Total Orders<b id="statOrders">0</b></div>
+      <div class="stat">Products<b>6</b></div>
+      <div class="stat">Pending<b id="statPending">0</b></div>
+    </div>
+    <div class="admin-box">
+      <h3>Manage Orders</h3>
+      <div id="adminOrders"></div>
+      <hr style="margin:20px 0;border:0;border-top:1px solid #eee">
+      <h3>Add a New Product (Demo)</h3>
+      <form onsubmit="addProduct(event)">
+        <label>Product Name</label><input id="newName" required>
+        <label>Price (₹)</label><input id="newPrice" type="number" min="1" required>
+        <label>Category</label><select id="newCategory"><option>Cake</option><option>Cookies</option><option>Brownie</option><option>Bread</option></select>
+        <button class="btn">Add Product</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="custom" class="page">
+  <div class="section">
+    <h2>Custom Cake Request</h2>
+    <div class="form-box">
+      <form onsubmit="submitCustom(event)">
+        <label>Your Name</label><input id="customName" required>
+        <label>Cake Type / Flavor</label><input id="customFlavor" placeholder="Chocolate, Red Velvet..." required>
+        <label>Size</label><select id="customSize"><option>1 kg</option><option>2 kg</option><option>3 kg</option></select>
+        <label>Message on Cake</label><input id="customMessage" placeholder="Happy Birthday!">
+        <label>Delivery Date</label><input id="customDate" type="date" required>
+        <label>Special Requirements</label><textarea id="customNotes"></textarea>
+        <button class="btn">Submit Custom Request</button>
+      </form>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>🧁 BakeEase | Home-Baked Order Management System | Hackathon Prototype</footer>
+
+<script>
+let products=[
+{id:1,name:"Chocolate Cake",price:650,cat:"Cake",emoji:"🎂"},
+{id:2,name:"Red Velvet Cake",price:750,cat:"Cake",emoji:"🍰"},
+{id:3,name:"Chocolate Brownie",price:180,cat:"Brownie",emoji:"🍫"},
+{id:4,name:"Butter Cookies",price:220,cat:"Cookies",emoji:"🍪"},
+{id:5,name:"Banana Bread",price:280,cat:"Bread",emoji:"🍞"},
+{id:6,name:"Vanilla Cupcakes",price:320,cat:"Cake",emoji:"🧁"}
+];
+let cart=JSON.parse(localStorage.getItem("bakeCart")||"[]");
+let orders=JSON.parse(localStorage.getItem("bakeOrders")||"[]");
+
+function save(){localStorage.setItem("bakeCart",JSON.stringify(cart));localStorage.setItem("bakeOrders",JSON.stringify(orders));}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ if(id==="products")renderProducts();
+ if(id==="cart")renderCart();
+ if(id==="orders")renderOrders();
+ if(id==="admin")renderAdmin();
+ window.scrollTo(0,0);
+}
+function renderProducts(){
+ let q=(document.getElementById("search")?.value||"").toLowerCase();
+ let list=products.filter(p=>(p.name+" "+p.cat).toLowerCase().includes(q));
+ document.getElementById("productGrid").innerHTML=list.map(p=>`
+ <div class="card"><div class="product-img">${p.emoji}</div><h3>${p.name}</h3><span class="badge">${p.cat}</span>
+ <div class="price">₹${p.price}</div><button class="btn" onclick="addCart(${p.id})">Add to Cart</button></div>`).join("");
+}
+function addCart(id){
+ let item=cart.find(x=>x.id===id);
+ if(item)item.qty++;else cart.push({id,qty:1});
+ save();updateCount();alert("Added to cart!");
+}
+function updateCount(){document.getElementById("cartCount").textContent=cart.reduce((a,x)=>a+x.qty,0);}
+function renderCart(){
+ let box=document.getElementById("cartBox");
+ if(!cart.length){box.innerHTML="<p>Your cart is empty. <button class='btn' onclick=\"showPage('products')\">Browse Products</button></p>";return;}
+ let total=0;
+ let rows=cart.map(x=>{let p=products.find(y=>y.id===x.id);let sub=p.price*x.qty;total+=sub;
+ return `<div class="cart-item"><div><b>${p.emoji} ${p.name}</b><br>₹${p.price} × ${x.qty}</div>
+ <div class="qty"><button onclick="changeQty(${p.id},-1)">−</button> ${x.qty} <button onclick="changeQty(${p.id},1)">+</button>
+ <button onclick="removeCart(${p.id})">✕</button></div></div>`}).join("");
+ box.innerHTML=rows+`<div class="total">Total: ₹${total}</div><button class="btn" onclick="showPage('checkout')">Proceed to Checkout</button>`;
+}
+function changeQty(id,n){let x=cart.find(a=>a.id===id);x.qty+=n;if(x.qty<=0)cart=cart.filter(a=>a.id!==id);save();updateCount();renderCart();}
+function removeCart(id){cart=cart.filter(x=>x.id!==id);save();updateCount();renderCart();}
+function placeOrder(e){
+ e.preventDefault();if(!cart.length)return;
+ let total=cart.reduce((s,x)=>s+products.find(p=>p.id===x.id).price*x.qty,0);
+ let order={id:"BE"+Date.now().toString().slice(-6),name:document.getElementById("customerName").value,
+ phone:document.getElementById("phone").value,address:document.getElementById("address").value,
+ date:document.getElementById("deliveryDate").value,payment:document.getElementById("payment").value,total,status:"Order Placed"};
+ orders.unshift(order);cart=[];save();updateCount();alert("Order placed successfully! Order ID: "+order.id);showPage("orders");
+}
+function renderOrders(){
+ let box=document.getElementById("ordersBox");
+ if(!orders.length){box.innerHTML="<p>No orders yet. Place your first order!</p>";return;}
+ box.innerHTML=orders.map(o=>`<div class="order"><b>Order #${o.id}</b><br>Customer: ${o.name}<br>Total: ₹${o.total}<br>Delivery: ${o.date}<br>Payment: ${o.payment}<br><span class="status">Status: ${o.status}</span></div>`).join("");
+}
+function renderAdmin(){
+ document.getElementById("statOrders").textContent=orders.length;
+ document.getElementById("statPending").textContent=orders.filter(o=>o.status!=="Delivered").length;
+ let box=document.getElementById("adminOrders");
+ if(!orders.length){box.innerHTML="<p>No orders available.</p>";return;}
+ box.innerHTML=orders.map(o=>`<div class="order"><b>#${o.id}</b> — ${o.name} — ₹${o.total}
+ <select onchange="updateStatus('${o.id}',this.value)">
+ <option ${o.status==="Order Placed"?"selected":""}>Order Placed</option>
+ <option ${o.status==="Confirmed"?"selected":""}>Confirmed</option>
+ <option ${o.status==="Baking"?"selected":""}>Baking</option>
+ <option ${o.status==="Ready"?"selected":""}>Ready</option>
+ <option ${o.status==="Out for Delivery"?"selected":""}>Out for Delivery</option>
+ <option ${o.status==="Delivered"?"selected":""}>Delivered</option>
+ </select></div>`).join("");
+}
+function updateStatus(id,status){let o=orders.find(x=>x.id===id);o.status=status;save();renderAdmin();}
+function addProduct(e){
+ e.preventDefault();let name=document.getElementById("newName").value,price=Number(document.getElementById("newPrice").value),cat=document.getElementById("newCategory").value;
+ let emoji=cat==="Cake"?"🎂":cat==="Cookies"?"🍪":cat==="Brownie"?"🍫":"🍞";
+ products.push({id:Date.now(),name,price,cat,emoji});alert("Product added to this demo.");e.target.reset();renderProducts();
+}
+function submitCustom(e){e.preventDefault();alert("Custom cake request submitted to the baker (demo).");e.target.reset();showPage("home");}
+updateCount();
+renderProducts();
+</script>
+</body>
+</html>
